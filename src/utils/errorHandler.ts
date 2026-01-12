@@ -1,5 +1,4 @@
 import { Alert } from 'react-native';
-import { AxiosError } from 'axios';
 
 /**
  * Handle API errors and show user-friendly messages

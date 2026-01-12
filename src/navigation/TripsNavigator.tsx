@@ -21,7 +21,7 @@ export const TripsNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={({ navigation }) => ({
-        headerShown: true,
+        headerShown: false,
         headerStyle: {
           backgroundColor: '#fff',
         },

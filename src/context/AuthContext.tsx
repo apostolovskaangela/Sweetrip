@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect } from "react";
+import { authApi } from "@/src/services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { authApi, User as ApiUser } from "@/src/services/api";
+import React, { createContext, useEffect, useState } from "react";
 
 export interface User {
   id: string | number;

@@ -17,3 +17,11 @@ export type TripsStackParamList = {
   TripCreate: undefined;
   TripEdit: { id: number };
 };
+
+export interface Vehicle {
+  id: number
+  registration_number: string
+  notes?: string
+  is_active: boolean
+  manager_id?: number
+}

@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     color: "#fff", 
     fontWeight: "600",
     padding: 4,
-   },
+},
   card: {
     backgroundColor: "#fff",
     padding: 14,
@@ -27,4 +27,8 @@ export const styles = StyleSheet.create({
   },
   route: { fontSize: 16, fontWeight: "600" },
   status: { marginVertical: 6, color: "#2563eb" },
+  active: { color: "green", marginTop: 4 },
+  inactive: { color: "gray", marginTop: 4 },
 });
+
+

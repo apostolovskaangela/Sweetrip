@@ -14,9 +14,9 @@ import { Platform } from 'react-native';
 //
 // Set your backend URL here:
 const DEV_BASE_URL = Platform.select({
-  android: 'http://192.168.31.173:8000/api', // Android emulator
-  ios: 'http://192.168.31.173:8000/api', // iOS simulator
-  default: 'http://192.168.31.173:8000/api', // Web/fallback
+  android: 'http://172.20.10.3:8000/api', // Android emulator
+  ios: 'http://172.20.10.3:8000/api', // iOS simulator
+  default: 'http://172.20.10.3:8000/api', // Web/fallback
 });
 
 // TODO: Replace with your actual backend IP address for physical devices

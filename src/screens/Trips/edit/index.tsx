@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
@@ -55,14 +54,14 @@ export default function TripEditScreen({ route, navigation }: any) {
       />
 
       <TextInput
-        style={styles.textarea}
+        style={styles.input}
         placeholder="Driver description (visible to driver)"
         value={form.driver_description ?? ""}
         onChangeText={(v) => set("driver_description", v)}
       />
 
       <TextInput
-        style={styles.textarea}
+        style={styles.input}
         placeholder="Admin description"
         value={form.admin_description ?? ""}
         onChangeText={(v) => set("admin_description", v)}

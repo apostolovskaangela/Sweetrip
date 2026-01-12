@@ -1,66 +1,45 @@
-import axiosClient from '../axiosClient';
+import axiosClient from "../axiosClient";
 
 export interface Vehicle {
   id: number;
   registration_number: string;
-  make?: string;
-  model?: string;
-  year?: number;
   notes?: string;
   is_active: boolean;
   manager_id?: number;
-  manager?: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  trips?: any[];
 }
 
-export interface CreateVehicleRequest {
-  registration_number: string;
-  make?: string;
-  model?: string;
-  year?: number;
-  notes?: string;
-  is_active?: boolean;
-  manager_id?: number;
-}
-
-export interface UpdateVehicleRequest extends Partial<CreateVehicleRequest> {}
-
-export interface VehiclesListResponse {
-  vehicles: Vehicle[];
-}
-
-export interface VehicleResponse {
-  vehicle: Vehicle;
-}
-
+// src/services/api.ts
 export const vehiclesApi = {
-  list: async (): Promise<Vehicle[]> => {
-    const response = await axiosClient.get<VehiclesListResponse>('/vehicles');
-    return response.data.vehicles;
+  list: async (): Promise<any[]> => {
+    try {
+      const response = await axiosClient.get("/vehicles");
+
+      console.log("Vehicles API response:", response.data); // DEBUG
+
+      // Backend returns { vehicles: [...] }, so return that array directly
+      return response.data.vehicles;
+    } catch (error) {
+      console.error("Vehicles API error", error);
+      throw error; // rethrow for the hook to catch
+    }
   },
 
-  get: async (id: number): Promise<Vehicle> => {
-    const response = await axiosClient.get<VehicleResponse>(`/vehicles/${id}`);
+  get: async (id: number) => {
+    const response = await axiosClient.get(`/vehicles/${id}`);
+    return response.data.vehicle; // make sure this matches backend
+  },
+
+  create: async (data: any) => {
+    const response = await axiosClient.post("/vehicles", data);
     return response.data.vehicle;
   },
 
-  create: async (data: CreateVehicleRequest): Promise<VehicleResponse> => {
-    const response = await axiosClient.post<VehicleResponse>('/vehicles', data);
-    return response.data;
+  update: async (id: number, data: any) => {
+    const response = await axiosClient.put(`/vehicles/${id}`, data);
+    return response.data.vehicle;
   },
 
-  update: async (id: number, data: UpdateVehicleRequest): Promise<VehicleResponse> => {
-    const response = await axiosClient.put<VehicleResponse>(`/vehicles/${id}`, data);
-    return response.data;
-  },
-
-  delete: async (id: number): Promise<void> => {
+  delete: async (id: number) => {
     await axiosClient.delete(`/vehicles/${id}`);
   },
 };
-
-

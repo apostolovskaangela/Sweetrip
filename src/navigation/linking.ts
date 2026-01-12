@@ -9,6 +9,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
         screens: {
           Dashboard: "dashboard",
           Trips: "trips",
+          Vehicles: "vehicles",
           //   Profile: 'profile',
         },
       },
