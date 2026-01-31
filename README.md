@@ -48,3 +48,52 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Project-specific notes
+
+- The app communicates with a backend API. When running the backend locally, set the API base URL in `src/config/api.ts` to your machine's IPv4 address (not `localhost`). Example:
+
+```js
+export const API_CONFIG = { BASE_URL: 'http://192.168.1.100:8000/api' };
+```
+
+- Use `ipconfig` (Windows) or `ifconfig` (Mac/Linux) to find your machine's IPv4 address and replace the example above.
+
+## Testing
+
+Unit tests are configured with Jest and use the `jest-expo` preset.
+
+- Run unit tests:
+
+```bash
+npm test
+```
+
+- Run tests with coverage (coverage thresholds set to 70%):
+
+```bash
+npm run test:coverage
+```
+
+- Integration tests (templates provided):
+
+```bash
+npm run test:integration
+```
+
+If `npm install` fails with peer dependency resolution errors (common when React versions mismatch with some test libraries), either run:
+
+```bash
+npm install --legacy-peer-deps
+```
+
+or use the project-default behavior (this repo includes a `.npmrc` that enables `legacy-peer-deps`), then run `npm install` again.
+
+## Integration & E2E
+
+- This repo contains scaffolding for integration and E2E tests. We recommend using Detox for native e2e or Playwright for web. See `e2e/README.md` for guidance on setting up Detox.
+
+## API docs
+
+- A minimal API reference is available at `docs/API.md`. For production-grade documentation, keep an OpenAPI/Swagger spec in the backend and export it here.
+
