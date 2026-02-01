@@ -1,17 +1,24 @@
-import OfflineQueueScreen from '@/src/components/OfflineQueueScreen';
+import { ThemeToggleButton } from '@/src/components/ui/ThemeToggleButton';
 import { Dashboard } from '@/src/screens/Dashboard';
 import { LiveTracking } from '@/src/screens/LiveTracking';
+import OfflineQueueScreen from '@/src/screens/OfflineQueue';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { createDrawerNavigator, DrawerNavigationProp } from '@react-navigation/drawer';
+import {
+  createDrawerNavigator,
+  DrawerNavigationProp,
+} from '@react-navigation/drawer';
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
+import { useTheme } from 'react-native-paper';
 import { TripsNavigator } from '../TripsNavigator';
 import { MainDrawerParamList } from '../types';
 import { VehiclesNavigator } from '../VehiclesNavigator';
 import { CustomDrawerContent } from './CustomDrawerContent';
-import { getDrawerActiveBackgroundColor, makeThemedStyles, styles } from './styles';
-import { useTheme } from 'react-native-paper';
-import { ThemeToggleButton } from '@/src/components/ui/ThemeToggleButton';
+import {
+  getDrawerActiveBackgroundColor,
+  makeThemedStyles,
+  styles,
+} from './styles';
 
 type HeaderTitleProps = {
   navigation: DrawerNavigationProp<MainDrawerParamList>;
@@ -32,7 +39,10 @@ const getHeaderTitle = (routeName: keyof MainDrawerParamList) => {
 };
 
 /** Utility: handle header title press for nested navigation */
-const handleHeaderTitlePress = (navigation: DrawerNavigationProp<MainDrawerParamList>, routeName: keyof MainDrawerParamList) => {
+const handleHeaderTitlePress = (
+  navigation: DrawerNavigationProp<MainDrawerParamList>,
+  routeName: keyof MainDrawerParamList
+) => {
   const nestedScreens: Record<string, { screen: string }> = {
     Vehicles: { screen: 'VehiclesList' },
     Trips: { screen: 'TripsList' },
@@ -49,9 +59,9 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({ navigation, routeName }) => {
   return (
     <TouchableOpacity
       onPress={() => handleHeaderTitlePress(navigation, routeName)}
-      accessibilityRole="button"
+      accessibilityRole='button'
       accessibilityLabel={`${title} (tap to go to list)`}
-      accessibilityHint="Navigates to the main list screen for this section"
+      accessibilityHint='Navigates to the main list screen for this section'
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     >
       <Text style={styles.headerTitleText}>{title}</Text>
@@ -64,7 +74,7 @@ export const MainNavigator: React.FC = () => {
   const themedStyles = React.useMemo(() => makeThemedStyles(theme), [theme]);
   return (
     <Drawer.Navigator
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={({ navigation, route }) => ({
         headerShown: true,
         headerStyle: themedStyles.headerStyle,
@@ -75,14 +85,23 @@ export const MainNavigator: React.FC = () => {
             onPress={() => navigation.openDrawer()}
             style={styles.menuButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            accessibilityRole="button"
-            accessibilityLabel="Open menu"
-            accessibilityHint="Opens the navigation drawer"
+            accessibilityRole='button'
+            accessibilityLabel='Open menu'
+            accessibilityHint='Opens the navigation drawer'
           >
-            <MaterialCommunityIcons name="menu" size={28} color={theme.colors.onSurface} />
+            <MaterialCommunityIcons
+              name='menu'
+              size={28}
+              color={theme.colors.onSurface}
+            />
           </TouchableOpacity>
         ),
-        headerTitle: () => <HeaderTitle navigation={navigation} routeName={route.name as keyof MainDrawerParamList} />,
+        headerTitle: () => (
+          <HeaderTitle
+            navigation={navigation}
+            routeName={route.name as keyof MainDrawerParamList}
+          />
+        ),
         headerRight: () => <ThemeToggleButton />,
         sceneContainerStyle: themedStyles.sceneContainerStyle,
         drawerStyle: themedStyles.drawerStyle,
@@ -91,11 +110,11 @@ export const MainNavigator: React.FC = () => {
         drawerActiveTintColor: theme.colors.primary,
       })}
     >
-      <Drawer.Screen name="Dashboard" component={Dashboard} />
-      <Drawer.Screen name="Trips" component={TripsNavigator} />
-      <Drawer.Screen name="Vehicles" component={VehiclesNavigator} />
-      <Drawer.Screen name="OfflineQueue" component={OfflineQueueScreen} />
-      <Drawer.Screen name="LiveTracking" component={LiveTracking} />
+      <Drawer.Screen name='Dashboard' component={Dashboard} />
+      <Drawer.Screen name='Trips' component={TripsNavigator} />
+      <Drawer.Screen name='Vehicles' component={VehiclesNavigator} />
+      <Drawer.Screen name='OfflineQueue' component={OfflineQueueScreen} />
+      <Drawer.Screen name='LiveTracking' component={LiveTracking} />
     </Drawer.Navigator>
   );
 };
