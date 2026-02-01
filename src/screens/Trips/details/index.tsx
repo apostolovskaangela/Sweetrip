@@ -5,27 +5,27 @@ import { Picker } from "@react-native-picker/picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { Image as ExpoImage } from "expo-image";
 import * as Sharing from "expo-sharing";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
-  Dimensions,
   Modal,
-  ScrollView,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { TripStatus, TripStatusLabel } from "../types";
 import { useTripDetailsLogic } from "./logic";
-import { styles } from "./styles";
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+import { makeThemedStyles, styles } from "./styles";
+import { Screen } from "@/src/components/ui/Screen";
+import { FadeIn } from "@/src/components/ui/FadeIn";
+import { PrimaryButton } from "@/src/components/ui/PrimaryButton";
+import { Text, useTheme } from "react-native-paper";
 
 export default function TripDetailsScreen({ route, navigation }: any) {
   const { trip, canEdit, canDriverUpdate, updateStatus } = useTripDetailsLogic(
     route.params.id
   );
+  const theme = useTheme();
+  const themedStyles = useMemo(() => makeThemedStyles(theme), [theme]);
 
   const [isUpdating, setIsUpdating] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
@@ -129,109 +129,125 @@ export default function TripDetailsScreen({ route, navigation }: any) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Trip: {trip.trip_number}</Text>
+    <Screen scroll accessibilityLabel="Trip details">
+      <FadeIn fromY={10}>
+        <Text style={themedStyles.title}>Trip {trip.trip_number}</Text>
+        <Text style={themedStyles.subtitle}>{trip.destination_from} → {trip.destination_to}</Text>
+      </FadeIn>
 
-      {canEdit && (
-        <TouchableOpacity
-          style={styles.editBtn}
-          onPress={() => navigation.navigate("TripEdit", { id: trip.id })}
-        >
-          <Text style={styles.btnText}>Edit</Text>
-        </TouchableOpacity>
-      )}
+      <FadeIn fromY={12} durationMs={260} style={themedStyles.contentFade}>
+        {canEdit && (
+          <PrimaryButton
+            onPress={() => navigation.navigate("TripEdit", { id: trip.id })}
+            accessibilityLabel="Edit trip"
+            style={themedStyles.buttonMarginBottom}
+          >
+            Edit
+          </PrimaryButton>
+        )}
 
-      <Text style={styles.sectionTitle}>
-        {trip.destination_from} → {trip.destination_to}
-      </Text>
-      <Text>Status: {TripStatusLabel[trip.status as TripStatus]}</Text>
-      <Text>Vehicle: {trip.vehicle?.registration_number ?? "-"}</Text>
-      <Text>Driver: {trip.driver?.name ?? "-"}</Text>
-      <Text>Date: {trip.trip_date}</Text>
-      <Text>Mileage: {trip.mileage ? `${trip.mileage} km` : "-"}</Text>
+        <View style={themedStyles.detailsCard}>
+          <Text style={themedStyles.detailsHeader}>Details</Text>
+          <Text style={themedStyles.detailsLine}>Status: {TripStatusLabel[trip.status as TripStatus]}</Text>
+          <Text style={themedStyles.detailsLine}>Vehicle: {trip.vehicle?.registration_number ?? "-"}</Text>
+          <Text style={themedStyles.detailsLine}>Driver: {trip.driver?.name ?? "-"}</Text>
+          <Text style={themedStyles.detailsLine}>Date: {trip.trip_date}</Text>
+          <Text style={themedStyles.detailsLine}>Mileage: {trip.mileage ? `${trip.mileage} km` : "-"}</Text>
+        </View>
 
-      {trip.stops?.length > 0 && (
-        <>
-          <Text style={styles.sectionTitle}>Stops</Text>
-          {trip.stops.map((s: any) => (
-            <Text key={s.id}>
-              {s.stop_order}. {s.destination}
-            </Text>
-          ))}
-        </>
-      )}
+        {trip.stops?.length > 0 && (
+          <>
+            <Text style={themedStyles.sectionTitle}>Stops</Text>
+            {trip.stops.map((s: any) => (
+              <View key={s.id} style={themedStyles.stopCard}>
+                <Text style={themedStyles.stopText}>{s.stop_order}. {s.destination}</Text>
+              </View>
+            ))}
+          </>
+        )}
 
-      {cmrUrl && (
-        <>
-          <Text style={styles.sectionTitle}>CMR Document</Text>
-          <TouchableOpacity onPress={() => setImageModalVisible(true)}>
+        {cmrUrl && (
+          <>
+            <Text style={themedStyles.cmrTitle}>CMR Document</Text>
+            <TouchableOpacity onPress={() => setImageModalVisible(true)} accessibilityRole="button" accessibilityLabel="Open CMR preview">
+              <ExpoImage
+                source={{ uri: cmrUrl }}
+                style={styles.cmrImage}
+                contentFit="contain"
+                cachePolicy="memory-disk"
+                transition={200}
+                placeholder={{ blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }}
+              />
+            </TouchableOpacity>
+            <View style={themedStyles.cmrActionsRow}>
+              <PrimaryButton
+                onPress={() => setImageModalVisible(true)}
+                accessibilityLabel="View CMR full size"
+                style={themedStyles.cmrActionLeft}
+              >
+                View
+              </PrimaryButton>
+              <PrimaryButton
+                onPress={handleDownloadCMR}
+                disabled={downloading}
+                loading={downloading}
+                accessibilityLabel="Download CMR"
+                style={themedStyles.cmrActionRight}
+              >
+                {downloading ? "Downloading..." : "Download"}
+              </PrimaryButton>
+            </View>
+          </>
+        )}
+
+        <Modal visible={imageModalVisible} transparent>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setImageModalVisible(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close CMR preview"
+            >
+              <Text style={styles.modalCloseText}>✕ Close</Text>
+            </TouchableOpacity>
             <ExpoImage
-              source={{ uri: cmrUrl }}
-              style={styles.cmrImage}
+              source={{ uri: cmrUrl || "" }}
+              style={styles.modalImage}
               contentFit="contain"
               cachePolicy="memory-disk"
               transition={200}
               placeholder={{ blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }}
             />
-          </TouchableOpacity>
-          <View style={styles.cmrActions}>
-            <TouchableOpacity style={styles.viewBtn} onPress={() => setImageModalVisible(true)}>
-              <Text style={styles.viewBtnText}>View Full Size</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.downloadBtn, downloading && styles.downloadBtnDisabled]}
-              onPress={handleDownloadCMR}
-              disabled={downloading}
-            >
-              {downloading ? <ActivityIndicator color="#fff" /> : <Text style={styles.downloadBtnText}>Download</Text>}
-            </TouchableOpacity>
           </View>
-        </>
-      )}
+        </Modal>
 
-      <Modal visible={imageModalVisible} transparent>
-        <View style={styles.modalContainer}>
-          <TouchableOpacity
-            style={styles.modalCloseButton}
-            onPress={() => setImageModalVisible(false)}
-          >
-            <Text style={styles.modalCloseText}>✕ Close</Text>
-          </TouchableOpacity>
-          <ExpoImage
-            source={{ uri: cmrUrl || "" }}
-            style={styles.modalImage}
-            contentFit="contain"
-            cachePolicy="memory-disk"
-            transition={200}
-            placeholder={{ blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }}
-          />
-        </View>
-      </Modal>
+        {canDriverUpdate && (
+          <>
+            <Text style={themedStyles.sectionTitle}>Update Trip Status</Text>
+            <View style={themedStyles.statusPickerContainer}>
+              <Picker
+                selectedValue={selectedStatus}
+                onValueChange={(val) => setSelectedStatus(val as TripStatus)}
+                style={styles.statusPicker}
+              >
+                {Object.values(TripStatus).map((status) => (
+                  <Picker.Item key={status} label={TripStatusLabel[status]} value={status} />
+                ))}
+              </Picker>
+            </View>
 
-      {canDriverUpdate && (
-        <>
-          <Text style={styles.sectionTitle}>Update Trip Status</Text>
-          <View style={styles.statusPickerContainer}>
-            <Picker
-              selectedValue={selectedStatus}
-              onValueChange={(val) => setSelectedStatus(val as TripStatus)}
-              style={styles.statusPicker}
+            <PrimaryButton
+              onPress={handleUpdateStatus}
+              disabled={isUpdating}
+              loading={isUpdating}
+              accessibilityLabel="Update trip status"
+              style={themedStyles.buttonMarginTop}
             >
-              {Object.values(TripStatus).map((status) => (
-                <Picker.Item key={status} label={TripStatusLabel[status]} value={status} />
-              ))}
-            </Picker>
-          </View>
-
-          <TouchableOpacity
-            style={[styles.updateBtn, isUpdating && styles.updateBtnDisabled]}
-            onPress={handleUpdateStatus}
-            disabled={isUpdating}
-          >
-            {isUpdating ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Update Status</Text>}
-          </TouchableOpacity>
-        </>
-      )}
-    </ScrollView>
+              {isUpdating ? "Updating..." : "Update Status"}
+            </PrimaryButton>
+          </>
+        )}
+      </FadeIn>
+    </Screen>
   );
 }

@@ -10,6 +10,21 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  themeToggleContainer: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+  },
+  contentWrapper: {
+    width: "100%",
+    maxWidth: 520,
+    alignItems: "center",
+  },
+  fadeButtonWrapper: {
+    width: "100%",
+    marginTop: 14,
+  },
   heroTitle: {
     fontSize: 36,
     fontWeight: "bold",
@@ -32,6 +47,9 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 8,
+  },
+  buttonCentered: {
+    alignSelf: "center",
   },
   buttonText: {
     fontSize: 16,

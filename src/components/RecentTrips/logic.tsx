@@ -1,12 +1,10 @@
-import { Trip } from "../types";
-
 interface BadgeStyle {
   backgroundColor: string;
   textColor: string;
 }
 
 // Map status to badge background + text color
-export function getStatusBadgeStyle(status: Trip["status"]): BadgeStyle {
+export function getStatusBadgeStyle(status: string): BadgeStyle {
   switch (status) {
     case "completed":
       return { backgroundColor: "#bff2bf", textColor: "#0a821c"}; 
@@ -21,6 +19,6 @@ export function getStatusBadgeStyle(status: Trip["status"]): BadgeStyle {
 }
 
 // Optional: status label display
-export function getStatusLabel(status: Trip["status"], label?: string) {
+export function getStatusLabel(status: string, label?: string) {
   return label ?? status.replace("_", " ").toUpperCase();
 }

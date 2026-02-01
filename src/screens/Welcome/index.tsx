@@ -1,29 +1,51 @@
 import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "@/src/navigation/types";
 import { styles } from "./styles";
+import { PrimaryButton } from "@/src/components/ui/PrimaryButton";
+import { FadeIn } from "@/src/components/ui/FadeIn";
+import { ThemeToggleButton } from "@/src/components/ui/ThemeToggleButton";
+import { useTheme } from "react-native-paper";
+import { getBrandGradient } from "@/src/theme/gradients";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
 export default function Welcome({ navigation }: Props) {
+  const theme = useTheme();
+
   return (
     <LinearGradient
-      colors={["hsl(217, 91%, 35%)", "hsl(200, 94%, 55%)", "hsl(25, 95%, 53%)"]}
+      colors={getBrandGradient(theme) as any}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <Text style={styles.title}>Fleet Management</Text>
-      <Text style={styles.subtitle}>Made Simple</Text>
+      <View style={styles.themeToggleContainer}>
+        <ThemeToggleButton accessibilityLabel="Toggle theme" />
+      </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.buttonText}>Start Free Trial</Text>
-      </TouchableOpacity>
+      <View style={styles.contentWrapper}>
+        <FadeIn fromY={14}>
+          <Text accessibilityRole="header" style={styles.title}>
+            Fleet Management
+          </Text>
+          <Text style={styles.subtitle}>Made Simple</Text>
+        </FadeIn>
+
+        <FadeIn fromY={18} durationMs={280} style={styles.fadeButtonWrapper}>
+          <PrimaryButton
+            onPress={() => navigation.navigate("Login")}
+            accessibilityLabel="Start free trial"
+            accessibilityHint="Navigates to the login screen"
+            style={[styles.button, styles.buttonCentered]}
+            textColor="#0b1220"
+          >
+            Start Free Trial
+          </PrimaryButton>
+        </FadeIn>
+      </View>
     </LinearGradient>
   );
 }

@@ -60,5 +60,19 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+  noLocationMarker: {
+    padding: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 10
+  },
+  noLocationText: {
+    color: 'white',
+  },
+  calloutContainer: {
+    maxWidth: 240,
+  },
+  calloutTitle: {
+    fontWeight: '700',
+  }
+
 });

@@ -1,7 +1,7 @@
-import { platformSelect, statusBarStyle } from "@/src/config/platform";
+import { platformSelect } from "@/src/config/platform";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
-import { ActivityIndicator, StatusBar, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Login from "@/src/components/Login";
@@ -16,6 +16,7 @@ import { AppState } from 'react-native';
 import { initDatabase } from '@/src/services/db';
 import { useAppNavigatorLogic } from "./logic";
 import { styles } from "./styles";
+import { ThemeProvider } from "@/src/theme/ThemeProvider";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -77,12 +78,13 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>
-      <StatusBar barStyle={statusBarStyle} backgroundColor="transparent" translucent={false} />
-      <QueryProvider>
-        <AuthProvider>
-          <AppNavigator />
-        </AuthProvider>
-      </QueryProvider>
+      <ThemeProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <AppNavigator />
+          </AuthProvider>
+        </QueryProvider>
+      </ThemeProvider>
     </SafeAreaView>
   );
 }

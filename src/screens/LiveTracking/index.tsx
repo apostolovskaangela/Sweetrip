@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Platform, View, Text, TouchableOpacity } from 'react-native';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import { useLiveDrivers } from '@/src/hooks/useLiveDrivers';
 import { useAuth } from '@/src/hooks/useAuth';
@@ -18,7 +18,19 @@ export function LiveTracking() {
   const myId = Number(user?.id);
   const { drivers } = useLiveDrivers(myId);
   const mapRef = useRef<MapView | null>(null);
+  type MarkerHandle = { showCallout?: () => void; hideCallout?: () => void } | null;
+  const markerRefs = useRef<Record<number, MarkerHandle>>({});
   const ZOOM_STEP = 1;
+
+  const webHoverPropsForDriver = (driverId: number) => {
+    if (Platform.OS !== 'web') return {};
+
+    // `react-native-maps` types don't expose mouse events, but they work on web.
+    return {
+      onMouseEnter: () => markerRefs.current[driverId]?.showCallout?.(),
+      onMouseLeave: () => markerRefs.current[driverId]?.hideCallout?.(),
+    } as any;
+  };
 
   const zoomIn = async () => {
     if (!mapRef.current) return;
@@ -81,8 +93,8 @@ export function LiveTracking() {
             anchor={{ x: 0.5, y: 0.5 }}
             tracksViewChanges={false}
           >
-            <View style={{ padding: 10, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 10 }}>
-              <Text style={{ color: 'white' }}>
+            <View style={styles.noLocationMarker}>
+              <Text style={styles.noLocationText}>
                 No shared locations yet. Ask users to allow location on login.
               </Text>
             </View>
@@ -91,10 +103,17 @@ export function LiveTracking() {
         {visibleDrivers.map((driver) => (
           <Marker
             key={driver.id}
+            ref={(ref) => {
+              markerRefs.current[driver.id] = ref;
+            }}
             coordinate={{
               latitude: Number(driver.lat),
               longitude: Number(driver.lng),
             }}
+            title={driver.name ?? 'Unknown'}
+            description={driver.role ?? undefined}
+            accessibilityLabel={`${driver.name ?? 'Unknown'} location marker`}
+            {...webHoverPropsForDriver(driver.id)}
           >
             <View style={driver.id === myId ? styles.myMarker : styles.markerStyle}>
               <Text style={driver.id === myId ? styles.myMarkerText : styles.driverMarkerText}>
@@ -102,8 +121,8 @@ export function LiveTracking() {
               </Text>
             </View>
             <Callout>
-              <View style={{ maxWidth: 240 }}>
-                <Text style={{ fontWeight: '700' }}>{driver.name ?? 'Unknown'}</Text>
+              <View style={styles.calloutContainer}>
+                <Text style={styles.calloutTitle}>{driver.name ?? 'Unknown'}</Text>
                 {!!driver.role && <Text>{driver.role}</Text>}
                 {!!driver.last_location_at && <Text>Updated: {driver.last_location_at}</Text>}
               </View>
@@ -114,11 +133,25 @@ export function LiveTracking() {
 
       {/* Zoom controls overlay */}
       <View style={styles.zoomControls}>
-        <TouchableOpacity style={styles.zoomButton} onPress={zoomIn}>
+        <TouchableOpacity
+          style={styles.zoomButton}
+          onPress={zoomIn}
+          accessibilityRole="button"
+          accessibilityLabel="Zoom in"
+          accessibilityHint="Zooms the map in"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <MaterialCommunityIcons name="plus" size={22} color="#fff" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.zoomButton} onPress={zoomOut}>
+        <TouchableOpacity
+          style={styles.zoomButton}
+          onPress={zoomOut}
+          accessibilityRole="button"
+          accessibilityLabel="Zoom out"
+          accessibilityHint="Zooms the map out"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <MaterialCommunityIcons name="minus" size={22} color="#fff" />
         </TouchableOpacity>
       </View>

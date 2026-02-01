@@ -9,7 +9,9 @@ import { TripsNavigator } from '../TripsNavigator';
 import { MainDrawerParamList } from '../types';
 import { VehiclesNavigator } from '../VehiclesNavigator';
 import { CustomDrawerContent } from './CustomDrawerContent';
-import { styles } from './styles';
+import { getDrawerActiveBackgroundColor, makeThemedStyles, styles } from './styles';
+import { useTheme } from 'react-native-paper';
+import { ThemeToggleButton } from '@/src/components/ui/ThemeToggleButton';
 
 type HeaderTitleProps = {
   navigation: DrawerNavigationProp<MainDrawerParamList>;
@@ -45,31 +47,48 @@ const handleHeaderTitlePress = (navigation: DrawerNavigationProp<MainDrawerParam
 const HeaderTitle: React.FC<HeaderTitleProps> = ({ navigation, routeName }) => {
   const title = getHeaderTitle(routeName);
   return (
-    <TouchableOpacity onPress={() => handleHeaderTitlePress(navigation, routeName)}>
+    <TouchableOpacity
+      onPress={() => handleHeaderTitlePress(navigation, routeName)}
+      accessibilityRole="button"
+      accessibilityLabel={`${title} (tap to go to list)`}
+      accessibilityHint="Navigates to the main list screen for this section"
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    >
       <Text style={styles.headerTitleText}>{title}</Text>
     </TouchableOpacity>
   );
 };
 
 export const MainNavigator: React.FC = () => {
+  const theme = useTheme();
+  const themedStyles = React.useMemo(() => makeThemedStyles(theme), [theme]);
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={({ navigation, route }) => ({
         headerShown: true,
-        headerStyle: styles.headerStyle,
-        headerTintColor: '#11181C',
-        headerTitleStyle: styles.headerTitleText,
+        headerStyle: themedStyles.headerStyle,
+        headerTintColor: theme.colors.onSurface,
+        headerTitleStyle: themedStyles.headerTitleText,
         headerLeft: () => (
           <TouchableOpacity
             onPress={() => navigation.openDrawer()}
             style={styles.menuButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessibilityRole="button"
+            accessibilityLabel="Open menu"
+            accessibilityHint="Opens the navigation drawer"
           >
-            <MaterialCommunityIcons name="menu" size={28} color="#11181C" />
+            <MaterialCommunityIcons name="menu" size={28} color={theme.colors.onSurface} />
           </TouchableOpacity>
         ),
         headerTitle: () => <HeaderTitle navigation={navigation} routeName={route.name as keyof MainDrawerParamList} />,
+        headerRight: () => <ThemeToggleButton />,
+        sceneContainerStyle: themedStyles.sceneContainerStyle,
+        drawerStyle: themedStyles.drawerStyle,
+        drawerActiveBackgroundColor: getDrawerActiveBackgroundColor(),
+        drawerInactiveTintColor: theme.colors.onSurfaceVariant,
+        drawerActiveTintColor: theme.colors.primary,
       })}
     >
       <Drawer.Screen name="Dashboard" component={Dashboard} />
