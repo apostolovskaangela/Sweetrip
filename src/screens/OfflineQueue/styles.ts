@@ -1,7 +1,9 @@
 import { StyleSheet } from 'react-native';
+import { MD3Theme } from 'react-native-paper';
 
-export const styles = StyleSheet.create({
-  containerQueue: { flex: 1, padding: 16, backgroundColor: '#F5F7FA' },
+export const makeStyles = (theme: MD3Theme) =>
+  StyleSheet.create({
+  containerQueue: { flex: 1, padding: 16, backgroundColor: theme.colors.elevation.level1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -10,12 +12,12 @@ export const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: '700' },
   clearBtn: {
-    backgroundColor: '#D9534F',
+    backgroundColor: theme.colors.error,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
   },
   clearText: { color: '#fff', fontWeight: '700' },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  emptyText: { color: '#666' },
+  emptyText: { color: theme.colors.onSurfaceVariant },
 });

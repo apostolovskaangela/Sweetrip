@@ -1,7 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { useIsOffline } from '@/src/hooks/useIsOffline';
 import { styles } from './styles';
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 
 export default function OfflineIndicator({ onPress }: Props) {
   const [queueCount, setQueueCount] = useState(0);
+  const isOffline = useIsOffline();
 
   useEffect(() => {
     let mounted = true;
@@ -28,7 +30,7 @@ export default function OfflineIndicator({ onPress }: Props) {
     return () => { mounted = false; clearInterval(id); };
   }, []);
 
-  if (queueCount === 0) return null;
+  if (!isOffline || queueCount === 0) return null;
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.container} activeOpacity={0.8}>

@@ -2,9 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import Offline, { OfflineRequest } from '@/src/services/offline';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/src/lib/queryKeys';
 
 export function useOfflineQueue() {
   const [items, setItems] = useState<OfflineRequest[]>([]);
+  const queryClient = useQueryClient();
 
   const load = useCallback(async () => {
     const raw = await AsyncStorage.getItem('OFFLINE_QUEUE_V1');
@@ -21,9 +24,11 @@ export function useOfflineQueue() {
   }, [load]);
 
   const handleRetry = useCallback(async (id: string) => {
-    await Offline.processQueue();
+    await Offline.processQueueItem(id);
+    queryClient.invalidateQueries({ queryKey: queryKeys.trips.lists() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.main() });
     await load();
-  }, [load]);
+  }, [load, queryClient]);
 
   const handleRemove = useCallback(async (id: string) => {
     const raw = await AsyncStorage.getItem('OFFLINE_QUEUE_V1');
