@@ -19,7 +19,7 @@ SweetTrip is a fleet management mobile app where managers create and assign trip
   - Key entry points and navigation buttons include labels/roles and keyboard-friendly flow
 - **Dark/Light theme**:
   - React Native Paper MD3 theme is provided globally (see `src/theme/paperTheme.ts`)
-
+   
 ## Tech stack
 
 - **Expo** + **React Native**
